@@ -15,7 +15,7 @@ $Nombre_Ejecutable = "mmClasicaFork";
 @Num_Hilos = (1,2,4,8,16,20);
 $Repeticiones = 30;
 
-# Bucle principal que recorre los tamanos de matriz definidos en @Size_Matriz.
+# Bucle principal que recorre los tamaños de matriz que fueron definidos ya  en @Size_Matriz.
 foreach $size (@Size_Matriz){
 	foreach $hilo (@Num_Hilos) {
 		$file = "$Path/$Nombre_Ejecutable-".$size."-Hilos-".$hilo.".dat";
@@ -28,5 +28,5 @@ foreach $size (@Size_Matriz){
 	}
 }
 
-# Une todos los ficheros .dat generados en un unico archivo .csv para su analisis.
+# Esto une todos los ficheros .dat generados en un unico archivo .csv que es el que se usa para la creación de las graficas
 system("cat *.dat > resultadosClasicosFork.csv");
