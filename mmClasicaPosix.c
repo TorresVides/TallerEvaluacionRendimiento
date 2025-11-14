@@ -3,17 +3,9 @@
  #* Docente:   J. Corredor, PhD
  #* Fichero:   mmClasicaPosix.c
  #* Descripcion:
- #*    Programa principal que lanza la version clasica con hilos POSIX y mide el rendimiento para distintos hilos.
+ #*    Programa principal que que realiza paralelismo con Hilos Pthreads "Posix" al multiplicar matrices
  #######################################################################################*/
 
-/*#######################################################################################
-#* Fecha:
-#* Autor: J. Corredor, PhD
-#* Programa:
-#*      Multiplicación de Matrices algoritmo clásico
-#* Versión:
-#*      Paralelismo con Hilos Pthreads "Posix" 
-######################################################################################*/
 
 #include <stdio.h>
 #include <pthread.h>
@@ -21,10 +13,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
-
+/*MUTEX*/
 pthread_mutex_t MM_mutex;
 double *matrixA, *matrixB, *matrixC;
-
+/* Estructura de parámetros de los hilos */
 struct parametros{
 	int nH;
 	int idH;
@@ -32,7 +24,7 @@ struct parametros{
 };
 
 struct timeval inicio, fin;
-
+/* Funciones para obtener datos de tiempo en microsegundos y comparar rendimiento */
 void InicioMuestra(){
 	gettimeofday(&inicio, (void *)0);
 }
@@ -45,14 +37,14 @@ void FinMuestra(){
 	printf("%9.0f \n", tiempo);
 }
 
-
+/* Colocar valores ramdon en las matrices A y B */
 void iniMatrix(double *m1, double *m2, int D){ 
 	for(int i = 0; i < D*D; i++, m1++, m2++){
 			*m1 = (double)rand()/RAND_MAX*(5.0-1.0); 
 			*m2 = (double)rand()/RAND_MAX*(9.0-5.0); 
 		}	
 }
-
+/* Para mostrar en pantalla aquellas matrices cuya dimension no supere los 9 */
 void impMatrix(double *matriz, int D){
 	if(D < 9){
     		for(int i = 0; i < D*D; i++){
@@ -62,7 +54,7 @@ void impMatrix(double *matriz, int D){
     	printf("\n>-------------------->\n");
 	}
 }
-
+/* Multiplicar las matrices */
 void *multiMatrix(void *variables){
 	struct parametros *data = (struct parametros *)variables;
 	
@@ -72,7 +64,7 @@ void *multiMatrix(void *variables){
 	int filaI	= (D/nH)*idH;
 	int filaF	= (D/nH)*(idH+1);
 	double Suma, *pA, *pB;
-
+	
     for (int i = filaI; i < filaF; i++){
         for (int j = 0; j < D; j++){
 			pA = matrixA + i*D; 
@@ -90,7 +82,7 @@ void *multiMatrix(void *variables){
 	pthread_exit(NULL);
 }
 
-/* Funcion principal: configura los hilos POSIX, reparte el trabajo y mide el tiempo total de ejecucion. */
+/* Funcion principal: configura los hilos POSIX, reparte el trabajo y mide el tiempo */
 int main(int argc, char *argv[]){
 	if (argc < 3){
 		printf("Ingreso de argumentos \n $./ejecutable tamMatriz numHilos\n");
@@ -101,11 +93,11 @@ int main(int argc, char *argv[]){
 
     pthread_t p[n_threads];
     pthread_attr_t atrMM;
-
+	/* Reservar memoria con calloc */
 	matrixA  = (double *)calloc(N*N, sizeof(double));
 	matrixB  = (double *)calloc(N*N, sizeof(double));
 	matrixC  = (double *)calloc(N*N, sizeof(double));
-
+	/* Llamadas en orden a las funciones */
 	iniMatrix(matrixA, matrixB, N);
 	impMatrix(matrixA, N);
 	impMatrix(matrixB, N);
@@ -124,7 +116,7 @@ int main(int argc, char *argv[]){
 
         pthread_create(&p[j],&atrMM,multiMatrix,(void *)datos);
 	}
-
+ /*  */
     for (int j=0; j<n_threads; j++)
         pthread_join(p[j],NULL);
 
