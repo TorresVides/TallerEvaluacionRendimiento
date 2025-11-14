@@ -3,17 +3,11 @@
  #* Docente:   J. Corredor, PhD
  #* Fichero:   mmClasicaFork.c
  #* Descripcion:
- #*    Programa completo que multiplica matrices usando procesos fork, repartiendo las filas entre procesos hijos.
+ #*    Programa completo que utiliza el algoritmo clasico de multiplicacion de 
+ 			matrices usando procesos fork, repartiendo las filas entre procesos hijos.
  #######################################################################################*/
 
-/*#######################################################################################
-#* Fecha:
-#* Autor: J. Corredor, PhD
-#* Programa:
-#*      Multiplicación de Matrices algoritmo clásico
-#* Versión:
-#*      Paralelismo con Procesos Fork 
-######################################################################################*/
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,12 +18,12 @@
 
 struct timeval inicio, fin;
 
-/* Marca el inicio del cronometro para medir el tiempo de ejecucion del programa con procesos fork. */
+/* Marca el inicio del cronometro para medir el tiempo de ejecucion del programa con procesos fork */
 void InicioMuestra(){
 	gettimeofday(&inicio, (void *)0);
 }
 
-/* Calcula el tiempo transcurrido desde InicioMuestra y lo imprime en microsegundos. */
+/* Calcula el tiempo transcurrido desde InicioMuestra y lo muestra por consola en microsegundos */
 void FinMuestra(){
 	gettimeofday(&fin, (void *)0);
 	fin.tv_usec -= inicio.tv_usec;
@@ -38,7 +32,7 @@ void FinMuestra(){
 	printf("%9.0f \n", tiempo);
 }
 
-/* Multiplica un subconjunto de filas de A por la matriz B y deja el resultado en C. */
+/* Esta funcion usa el algoritmo clasico de la multiplicacion de matrices, y se guarda el resultado en la matriz C */
 void multiMatrix(double *mA, double *mB, double *mC, int D, int filaI, int filaF) {
 	double Suma, *pA, *pB;
     for (int i = filaI; i < filaF; i++) {
@@ -54,7 +48,7 @@ void multiMatrix(double *mA, double *mB, double *mC, int D, int filaI, int filaF
     }
 }
 
-/* Imprime la matriz cuadrada por pantalla cuando el tamano es pequeno. */
+/* Imprime la matriz cuadrada por pantalla cuando la dimension D es menor a 9 */
 void impMatrix(double *matrix, int D) {
 	if (D < 9) {
     	printf("\nImpresión	...\n");
@@ -66,7 +60,7 @@ void impMatrix(double *matrix, int D) {
     }
 }
 
-/* Inicializa las matrices A y B con valores aleatorios para poder probar el rendimiento. */
+/* Usando rand() y RAND_MAX, se inicializan las matrices A y B con valores aleatorios entre 0.0 y 4.0 para poder probar el rendimiento */
 void iniMatrix(double *mA, double *mB, int D){
 	for (int i = 0; i < D*D; i++, mA++, mB++){
             *mA = (double)rand()/RAND_MAX*(5.0-1.0); ; 
@@ -87,13 +81,13 @@ int main(int argc, char *argv[]) {
 	double *matC = (double *) calloc(N*N, sizeof(double));
 
     srand(time(0)); 
-    
+    /* Se inicializan las matrices con los valores double aleatorios y se llama a las funciones de impresión */
     iniMatrix(matA, matB, N);
     impMatrix(matA, N);
     impMatrix(matB, N);
-    
+    /* Filas por proceso */
     int rows_per_process = N/num_P;
-
+	/* Marcar el inicio de ejecución */
 	InicioMuestra();
 
     for (int i = 0; i < num_P; i++) {
@@ -101,6 +95,7 @@ int main(int argc, char *argv[]) {
         
         if (pid == 0) { 
             int start_row = i * rows_per_process;
+			/* Para dejar las filas restantes al ultimo proceso */
             int end_row = (i == num_P - 1) ? N : start_row + rows_per_process;
             
 			multiMatrix(matA, matB, matC, N, start_row, end_row); 
@@ -124,9 +119,9 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < num_P; i++) {
         wait(NULL);
     }
-  	
+  /* Marcar el tiempo total */	
 	FinMuestra(); 
- 
+ /*Liberar memoria */
 	free(matA);
 	free(matB);
 	free(matC);
