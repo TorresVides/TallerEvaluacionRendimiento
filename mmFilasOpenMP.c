@@ -5,15 +5,7 @@
  #* Descripcion:
  #*    Programa principal que usa el modulo de filas x filas con OpenMP y reporta tiempos de ejecucion.
  #######################################################################################*/
-
-/*#######################################################################################
- #* Fecha:
- #* Autor: J. Corredor, PhD
- #* Programa:
- #*      Multiplicación de Matrices algoritmo matriz Transpuesta (Filas x Filas) 
- #* Versión:
- #*      Paralelismo con OpenMP
- #######################################################################################*/
+/*Librerias*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +28,7 @@ void FinMuestra(){
 	double tiempo = (double) (fin.tv_sec*1000000 + fin.tv_usec); 
 	printf("%9.0f \n", tiempo);
 }
-
+/* Imprimir matriz unicamente si ésta es pequeña */
 void impMatrix(double *matrix, int D, int t){
 	int aux = 0;
 	if(D < 6)
@@ -61,14 +53,14 @@ void impMatrix(double *matrix, int D, int t){
 				printf("Sin tipo de impresión\n");
 		}
 }
-
+/* Inicializar matriz con valores random*/
 void iniMatrix(double *m1, double *m2, int D){
 	for(int i=0; i<D*D; i++, m1++, m2++){
 		*m1 = (double)rand()/RAND_MAX*(5.0-1.0);	
 		*m2 = (double)rand()/RAND_MAX*(9.0-5.0);		
 	}
 }
-
+/* multiplicar matriz transpuesta fila x fila */
 void multiMatrixTrans(double *mA, double *mB, double *mC, int D){
 	double Suma, *pA, *pB;
 	#pragma omp parallel
