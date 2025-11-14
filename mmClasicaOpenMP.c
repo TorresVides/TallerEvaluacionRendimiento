@@ -3,18 +3,10 @@
  #* Docente:   J. Corredor, PhD
  #* Fichero:   mmClasicaOpenMP.c
  #* Descripcion:
- #*    Programa principal que ejecuta la version clasica con OpenMP leyendo tamano de matriz y numero de hilos.
+ #*    Programa principal que ejecuta el algoritmo clasico de multiplicacion de matrices con OpenMP leyendo tamaño de matriz y numero de hilos.
  #######################################################################################*/
 
-/*#######################################################################################
- #* Fecha: 
- #* Autor: J. Corredor, PhD
- #* Programa: 
- #* 	 Multiplicación de Matrices algoritmo clásico
- #* Versión:
- #*	 Paralelismo con OpenMP
-######################################################################################*/
-
+/* Librerías */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,11 +15,11 @@
 #include <omp.h>
 
 struct timeval inicio, fin; 
-
+/* Marcar el inicio de ejcucion */
 void InicioMuestra(){
 	gettimeofday(&inicio, (void *)0);
 }
-
+/* Calcular el total de tiempo en microsegundos */
 void FinMuestra(){
 	gettimeofday(&fin, (void *)0);
 	fin.tv_usec -= inicio.tv_usec;
@@ -35,7 +27,7 @@ void FinMuestra(){
 	double tiempo = (double) (fin.tv_sec*1000000 + fin.tv_usec); 
 	printf("%9.0f \n", tiempo);
 }
-
+/* Imprimir la matriz si ésta es pequeñita */
 void impMatrix(double *matrix, int D){
 	if(D < 9){
 		printf("\n");
@@ -46,14 +38,14 @@ void impMatrix(double *matrix, int D){
 		printf("\n**-----------------------------**\n");
 	}
 }
-
+/* Inicializar matrices con numers random de tipo double entre 0.0 y 4.0 */
 void iniMatrix(double *m1, double *m2, int D){
 	for(int i=0; i<D*D; i++, m1++, m2++){
 		*m1 = (double)rand()/RAND_MAX*(5.0-1.0);	
 		*m2 = (double)rand()/RAND_MAX*(9.0-2.0);	
 	}
 }
-
+/* Funcion que va multiplicar las matrices entre si */
 void multiMatrix(double *mA, double *mB, double *mC, int D){
 	double Suma, *pA, *pB;
 	#pragma omp parallel
@@ -73,22 +65,23 @@ void multiMatrix(double *mA, double *mB, double *mC, int D){
 	}
 }
 
-/* Funcion principal: prepara las matrices, fija el numero de hilos OpenMP y mide la ejecucion del algoritmo clasico. */
+/* Funcion principal: prepara las matrices, fija el numero de hilos OpenMP y mide la ejecucion del algoritmo */
 int main(int argc, char *argv[]){
 	if(argc < 3){
 		printf("\n Use: $./clasicaOpenMP SIZE Hilos \n\n");
 		exit(0);
 	}
 
-
+	
 	int N = atoi(argv[1]);
 	int TH = atoi(argv[2]);
+	/* Reservar memoria con calloc() y teniendo en cuenta el tamaño de double */
 	double *matrixA  = (double *)calloc(N*N, sizeof(double));
 	double *matrixB  = (double *)calloc(N*N, sizeof(double));
 	double *matrixC  = (double *)calloc(N*N, sizeof(double));
 
 	srand(time(NULL));
-
+    /* Llamado de las funciones */
 	omp_set_num_threads(TH);
 
 	iniMatrix(matrixA, matrixB, N);
